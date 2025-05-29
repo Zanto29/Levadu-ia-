@@ -1,0 +1,26 @@
+// Obtenemos el string plano del campo 'output'
+const texto = items[0].json.output;
+
+// Separamos por filas: cada una empieza con "*   **Fila"
+const bloques = texto.split('*   **Fila').slice(1); // quitamos el primer trozo de intro
+
+// Función para parsear cada bloque
+const personas = bloques.map(bloque => {
+  const getCampo = (label) => {
+    const match = bloque.match(new RegExp(`\\*\\s+${label}:\\s+(.*)`));
+    return match ? match[1].trim() : null;
+  };
+
+  return {
+    json: {
+      apellidos: getCampo('APELLIDOS'),
+      nombres: getCampo('NOMBRES'),
+      cedula: getCampo('CEDULA'),
+      sexo: getCampo('SEXO'),
+      celular: getCampo('NUMERO DE CELULAR'),
+      cargo: getCampo('CARGO')
+    }
+  };
+});
+
+return personas;
