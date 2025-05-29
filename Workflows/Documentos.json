@@ -1,0 +1,208 @@
+{
+  "name": "Documentos",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "dame todos los datos del excel",
+        "options": {
+          "systemMessage": "Eres un asistente muy eficaz que no omite datos y siempre da una respuesta, tienes la herramienta sheets puedes leer y responder en base a eso"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        340,
+        -20
+      ],
+      "id": "4c4a35ab-8a01-43fe-b527-5eee077b4ac8",
+      "name": "AI Agent",
+      "alwaysOutputData": false,
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-pro-preview-05-06",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        260,
+        220
+      ],
+      "id": "2d035dde-b8c4-4c47-a5e2-6d96cc107ea8",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "q2bOCN0CqCNo6V0d",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1OX9g7gzQYX_WcgeHg4_mmpsezxGucqCQVWvDkjcbeak",
+          "mode": "list",
+          "cachedResultName": "Aviso mensajes medicos",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1OX9g7gzQYX_WcgeHg4_mmpsezxGucqCQVWvDkjcbeak/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Hoja 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1OX9g7gzQYX_WcgeHg4_mmpsezxGucqCQVWvDkjcbeak/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.6,
+      "position": [
+        480,
+        220
+      ],
+      "id": "07c42239-6f0d-4abd-aeac-7627a68667b8",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ktgan0deIfiohZkd",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "phoneNumberId": "575080582364931",
+        "recipientPhoneNumber": "=57{{ $json.celular }}",
+        "template": "documentos|es_CO",
+        "components": {
+          "component": [
+            {
+              "bodyParameters": {
+                "parameter": [
+                  {
+                    "text": "={{ $json.nombres }} {{ $json.apellidos }}"
+                  },
+                  {
+                    "text": "={{ $json.cargo }}"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        940,
+        0
+      ],
+      "id": "85ef8f9a-557a-4ef9-a48b-dc6e88b38d53",
+      "name": "WhatsApp Business Cloud",
+      "webhookId": "3651d15f-ed89-4583-b829-baef2c58d869",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "XnSvmAvLslOjGQmI",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Obtenemos el string plano del campo 'output'\nconst texto = items[0].json.output;\n\n// Separamos por filas: cada una empieza con \"*   **Fila\"\nconst bloques = texto.split('*   **Fila').slice(1); // quitamos el primer trozo de intro\n\n// Función para parsear cada bloque\nconst personas = bloques.map(bloque => {\n  const getCampo = (label) => {\n    const match = bloque.match(new RegExp(`\\\\*\\\\s+${label}:\\\\s+(.*)`));\n    return match ? match[1].trim() : null;\n  };\n\n  return {\n    json: {\n      apellidos: getCampo('APELLIDOS'),\n      nombres: getCampo('NOMBRES'),\n      cedula: getCampo('CEDULA'),\n      sexo: getCampo('SEXO'),\n      celular: getCampo('NUMERO DE CELULAR'),\n      cargo: getCampo('CARGO')\n    }\n  };\n});\n\nreturn personas;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        700,
+        -20
+      ],
+      "id": "aab3a7ea-c2b1-4bb5-8913-207fef41dbe7",
+      "name": "Code"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "86821c17-47b2-4dc3-932c-5e461a47568f",
+      "name": "When clicking ‘Execute workflow’"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "WhatsApp Business Cloud",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d564ce37-2dd0-4b8d-ac42-5d9c4814a41e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fe03c2dc554d84c1e071c6b8142443bee89173956251fa899a39119570d76313"
+  },
+  "id": "2En28RdGqVrbniqc",
+  "tags": []
+}

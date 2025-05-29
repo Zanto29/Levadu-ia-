@@ -1,0 +1,211 @@
+{
+  "name": "Examenes",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "dame todos los datos del excel",
+        "options": {
+          "systemMessage": "Eres un asistente muy eficaz que no omite datos y siempre da una respuesta, tienes la herramienta sheets puedes leer y responder en base a eso"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        340,
+        -20
+      ],
+      "id": "b8954f5e-f35c-451f-b196-b5a0ef72229d",
+      "name": "AI Agent",
+      "alwaysOutputData": false,
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-pro-preview-05-06",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        260,
+        220
+      ],
+      "id": "6bf286fc-e680-40df-aefb-094e307fb738",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "q2bOCN0CqCNo6V0d",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1OX9g7gzQYX_WcgeHg4_mmpsezxGucqCQVWvDkjcbeak",
+          "mode": "list",
+          "cachedResultName": "Aviso mensajes medicos",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1OX9g7gzQYX_WcgeHg4_mmpsezxGucqCQVWvDkjcbeak/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Hoja 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1OX9g7gzQYX_WcgeHg4_mmpsezxGucqCQVWvDkjcbeak/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.6,
+      "position": [
+        480,
+        220
+      ],
+      "id": "5d151be4-b7b5-4343-8654-30106e032ee6",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ktgan0deIfiohZkd",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "phoneNumberId": "575080582364931",
+        "recipientPhoneNumber": "=57{{ $json.celular }}",
+        "template": "examenmedico|es_CO",
+        "components": {
+          "component": [
+            {
+              "bodyParameters": {
+                "parameter": [
+                  {
+                    "text": "={{ $json.nombres }} {{ $json.apellidos }}"
+                  },
+                  {
+                    "text": "={{ $json.cargo }}"
+                  },
+                  {
+                    "text": "={{ new Date(Date.now() + 86400000).toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' }) }}"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        940,
+        0
+      ],
+      "id": "531af1a9-c6a1-49fd-9f84-3d6b331d2db4",
+      "name": "WhatsApp Business Cloud",
+      "webhookId": "31a853e6-7f7e-4cf5-8bfb-b6caf7a8295f",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "XnSvmAvLslOjGQmI",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Obtenemos el string plano del campo 'output'\nconst texto = items[0].json.output;\n\n// Separamos por filas: cada una empieza con \"*   **Fila\"\nconst bloques = texto.split('*   **Fila').slice(1); // quitamos el primer trozo de intro\n\n// Función para parsear cada bloque\nconst personas = bloques.map(bloque => {\n  const getCampo = (label) => {\n    const match = bloque.match(new RegExp(`\\\\*\\\\s+${label}:\\\\s+(.*)`));\n    return match ? match[1].trim() : null;\n  };\n\n  return {\n    json: {\n      apellidos: getCampo('APELLIDOS'),\n      nombres: getCampo('NOMBRES'),\n      cedula: getCampo('CEDULA'),\n      sexo: getCampo('SEXO'),\n      celular: getCampo('NUMERO DE CELULAR'),\n      cargo: getCampo('CARGO')\n    }\n  };\n});\n\nreturn personas;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        700,
+        -20
+      ],
+      "id": "76389c8b-71ae-477a-bd1b-1bcc3f236c5c",
+      "name": "Code"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "05334a0d-e818-4d6f-b0b1-1ada93f3f00c",
+      "name": "When clicking ‘Execute workflow’"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "WhatsApp Business Cloud",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "4484cf64-1cb1-4a75-a56a-6ff8d118a12f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fe03c2dc554d84c1e071c6b8142443bee89173956251fa899a39119570d76313"
+  },
+  "id": "aiQOsOKZrNQWxYw9",
+  "tags": []
+}

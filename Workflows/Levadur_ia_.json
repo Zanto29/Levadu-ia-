@@ -1,0 +1,414 @@
+{
+  "name": "Levadur(ia)",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "messages"
+        ],
+        "options": {}
+      },
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "6aec8eb8-1131-4103-a693-8bb0c46c44ae",
+      "name": "WhatsApp Trigger",
+      "webhookId": "52714b46-329e-424c-b930-5681ac3e9602",
+      "credentials": {
+        "whatsAppTriggerApi": {
+          "id": "hs33JzhZzp7IquxW",
+          "name": "WhatsApp OAuth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.messages[0].text.body }}",
+        "options": {
+          "systemMessage": "# Rol\nSos un agente de inteligencia artificial que adopta el tono y modismos de un rolo tradicional, es decir, una persona mayor oriunda de Bogotá, Colombia. Hablás como un cachaco clásico, utilizando expresiones típicas como \"¡A la carachas!\", \"¡Chino!\", \"¡No joda!\", entre otras. Tenés acceso a herramientas como Wikipedia, calculadora y Google Sheets, que usás para consultar y brindar información precisa de manera breve y concisa. Tu experiencia como asistente digital está combinada con una personalidad muy característica, lo que hace que tus respuestas sean únicas y entretenidas.\n\n# Tarea\nTu tarea principal es responder consultas de manera breve, precisa y con el tono rolo mencionado. Utilizás tus herramientas para:\n\n- Consultar hechos en Wikipedia\n- Hacer cálculos rápidos con la calculadora\n- Revisar y manipular datos en hojas de cálculo (Google Sheets)\n\nTodo esto mientras mantenés un estilo conversacional típico de un rolo tradicional.\n\n# Detalles Específicos\n- Respondés con frases breves y modismos bogotanos\n- Siempre que sea posible, usás expresiones rolas para iniciar o terminar tu respuesta\n- Nunca perdés el personaje\n- Mantenés un equilibrio entre precisión y brevedad\n- Incluís un sistema de \"switch\" en las respuestas:\n  - Si el usuario dice algo como \"envía exámenes médicos\" o frases similares, la respuesta debe ser exactamente: `ok, va`\n  - Si el usuario dice algo como \"indica los documentos para contratación\", \"contratación\" o \"documentos\", la respuesta debe ser exactamente: `voy`\n  - En cualquier otro caso, respondés normalmente según tu personaje rolo\n\n# Contexto\nEste personaje será utilizado en una plataforma que busca humanizar el acceso a la información, brindando un asistente con identidad cultural fuerte y divertida, sin perder precisión ni eficiencia. La audiencia incluye usuarios de Latinoamérica que buscan respuestas rápidas, pero disfrutan de una interacción más cercana y entretenida.\n\n# Ejemplos\n\n- Pregunta: ¿Cuándo fue la independencia de Colombia?\n  Respuesta: ¡A la carachas, eso fue el 20 de julio de 1810, chino!\n\n- Pregunta: ¿Cuánto es 235 dividido entre 7?\n  Respuesta: ¡Uy no joda! Eso da 33.57 más o menos, según mi calculadora, mijo.\n\n- Pregunta: ¿Cuántos habitantes tiene Bogotá?\n  Respuesta: ¡Pues vea! Según la Wikipedia, Bogotá tiene como 7.9 millones de almas, chino.\n\n- Pregunta: envía exámenes médicos\n  Respuesta: ok, va\n\n- Pregunta: indica los documentos para contratación\n  Respuesta: voy\n\n# Notas\n- Siempre mantené el personaje del rolo viejo: amable, sabio, algo sarcástico pero nunca ofensivo\n- Si no sabés algo, respondé con un \"¡Déjeme reviso eso un momentico, mijo!\" y usá la herramienta necesaria\n- Nunca respondas sin revisar primero en caso de dudas sobre datos numéricos o históricos\n- Evitá respuestas extensas, que el cachaco no se enreda con tanta palabrería\n- Las respuestas de \"ok, va\" y \"voy\" deben ser exactas para activar funciones de control externo\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        220,
+        0
+      ],
+      "id": "1b5b2ef7-8899-4fe8-947d-1de034ee15fb",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-pro-preview-05-06",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        260,
+        220
+      ],
+      "id": "61544ed8-5957-4ca0-8737-8d20d7e0c674",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "q2bOCN0CqCNo6V0d",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1OX9g7gzQYX_WcgeHg4_mmpsezxGucqCQVWvDkjcbeak",
+          "mode": "list",
+          "cachedResultName": "Aviso mensajes medicos",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1OX9g7gzQYX_WcgeHg4_mmpsezxGucqCQVWvDkjcbeak/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Hoja 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1OX9g7gzQYX_WcgeHg4_mmpsezxGucqCQVWvDkjcbeak/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.6,
+      "position": [
+        680,
+        180
+      ],
+      "id": "7b23ba29-be19-453c-b9db-affa89b85b9b",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ktgan0deIfiohZkd",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.messages[0].text.body }}",
+        "contextWindowLength": 50
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        360,
+        220
+      ],
+      "id": "42014eff-37ed-4e3b-918f-a58ac5bc1da7",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "typeVersion": 1,
+      "position": [
+        449,
+        220
+      ],
+      "id": "1705bbf9-3df6-4e38-b363-83c1ebfa28b1",
+      "name": "Calculator"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolWikipedia",
+      "typeVersion": 1,
+      "position": [
+        560,
+        200
+      ],
+      "id": "58e21c14-a64b-4d3b-890d-cfc05500c575",
+      "name": "Wikipedia"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "575080582364931",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}",
+        "textBody": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        0
+      ],
+      "id": "b3b9ace0-ac01-4a71-9ea1-5e5de21364fd",
+      "name": "WhatsApp Business Cloud",
+      "webhookId": "a4e3b286-3164-46ec-9426-bf8de16132ff",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "XnSvmAvLslOjGQmI",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.output }}",
+                    "rightValue": "ok, va",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    },
+                    "id": "b680452b-caf7-43f1-9c07-9a6fd9ed7bec"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "684e7286-b714-4031-b12c-bc69e90e505e",
+                    "leftValue": "={{ $json.output }}",
+                    "rightValue": "voy",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "f9c9254b-8199-44df-8607-7c6a62c26db1",
+                    "leftValue": "={{ $json.output }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        760,
+        0
+      ],
+      "id": "e0681dc3-98be-4fb0-90f7-2b7d4f7f92e0",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "aiQOsOKZrNQWxYw9",
+          "mode": "list",
+          "cachedResultName": "Examenes"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1080,
+        -220
+      ],
+      "id": "72ac4892-2253-4345-b26a-9f85a31c99d3",
+      "name": "Execute Workflow"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "2En28RdGqVrbniqc",
+          "mode": "list",
+          "cachedResultName": "Documentos"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1080,
+        -80
+      ],
+      "id": "92d0e40d-3051-48a3-b6d6-987ef5d14803",
+      "name": "Execute Workflow1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "WhatsApp Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculator": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wikipedia": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Execute Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Execute Workflow1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "WhatsApp Business Cloud",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "61912cbb-875c-4395-b9d9-452265eb4dd9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fe03c2dc554d84c1e071c6b8142443bee89173956251fa899a39119570d76313"
+  },
+  "id": "394SdueTRt4LqXX0",
+  "tags": []
+}
